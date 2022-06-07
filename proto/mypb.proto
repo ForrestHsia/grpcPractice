@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package mypb;
+
+option go_package = "proto/mypb";
+
+service MyprotoService{
+    rpc AddUser(UserRequest) returns (UserResponse){}
+    rpc LoginUser(UserRequest) returns (UserResponse){}
+    rpc UserList(UserListRequest) returns (UserListResponse){}
+    rpc PingTest(PingRequest) returns (PingResponse){}
+}
+
+message UserRequest{
+    string user_name = 1;
+    string user_pwd = 2;
+}
+
+message UserResponse{
+    string result = 1;
+}
+
+message UserListRequest{
+}
+
+message UserListResponse{
+    string result = 1;
+    repeated string user_name = 2;
+}
+
+message PingRequest{
+}
+
+message PingResponse{
+    string resultString = 1;
+}
