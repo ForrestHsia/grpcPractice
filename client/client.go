@@ -21,7 +21,7 @@ func main() {
 
 	AddUser("test1", "123456")
 	AddUser("test2", "123456")
-	LoginUser("test1", "12345")
+	LoginUser("test1", "123456")
 	UserList()
 }
 
@@ -46,8 +46,13 @@ func LoginUser(username, userpwd string) {
 	if err != nil {
 		log.Fatalf("failed to login user: %v", err)
 	}
-	fmt.Println(username,res.Result)
+	fmt.Println(username, res.Result)
 }
 
-
-
+func UserList() {
+	res, err := grpcClient.UserList(context.Background(), &pb.UserListRequest{})
+	if err != nil {
+		log.Fatalf("User List Error: ", err)
+	}
+	fmt.Println(res.Result, " / ", res.UserName)
+}

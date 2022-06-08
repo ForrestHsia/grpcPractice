@@ -19,7 +19,7 @@ var UserData sync.Map
 func main() {
 	lis, err := net.Listen("tcp", "localhost:8081")
 	if err != nil {
-		log.Fatal("failed to listen: %v", err)
+		log.Fatal("failed to listen:", err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterMyprotoServiceServer(s, &ServerService{})
