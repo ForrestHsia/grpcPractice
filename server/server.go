@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	pb "grpcPractice/proto"
 	"log"
 	"net"
 	sync "sync"
-mypb "./proto/mypb"
+
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -16,12 +17,12 @@ type ServerService struct{}
 var UserData sync.Map
 
 func main() {
-	lis, err := net.Listen("tcp", ":8081")
+	lis, err := net.Listen("tcp", "localhost:8081")
 	if err != nil {
 		log.Fatal("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	mypb.RegisterMyprotoServiceServer(s, &ServerService{})
+	pb.RegisterMyprotoServiceServer(s, &ServerService{})
 	reflection.Register(s)
 
 	if err := s.Serve(lis); err != nil {
@@ -30,19 +31,19 @@ func main() {
 	}
 }
 
-func (s *ServerService) AddUser(ctx context.Context, in *UserRequest) (*UserResponse, error) {
+func (s *ServerService) AddUser(ctx context.Context, in *pb.UserRequest) (*pb.UserResponse, error) {
 	var result string = "error"
 	_, ok := UserData.Load(in.UserName)
 	if !ok {
 		UserData.Store(in.UserName, in.UserPwd)
 		result = "ok"
 	}
-	return &UserResponse{
+	return &pb.UserResponse{
 		Result: result,
 	}, nil
 }
 
-func (s *ServerService) LoginUser(ctx context.Context, in *UserRequest) (*UserResponse, error) {
+func (s *ServerService) LoginUser(ctx context.Context, in *pb.UserRequest) (*pb.UserResponse, error) {
 	var result string = "error"
 	pwd, ok := UserData.Load(in.UserName)
 	if pwd == in.UserPwd {
@@ -50,12 +51,12 @@ func (s *ServerService) LoginUser(ctx context.Context, in *UserRequest) (*UserRe
 			result = "ok"
 		}
 	}
-	return &UserResponse{
+	return &pb.UserResponse{
 		Result: result,
 	}, nil
 }
 
-func (s *ServerService) UserList(ctx context.Context, in *UserListRequest) (*UserListResponse, error) {
+func (s *ServerService) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
 	var users []string
 	f := func(k, v interface{}) bool {
 		var name string
@@ -65,15 +66,15 @@ func (s *ServerService) UserList(ctx context.Context, in *UserListRequest) (*Use
 		return true
 	}
 	UserData.Range(f)
-	return &UserListResponse{
+	return &pb.UserListResponse{
 		Result:   "ok",
 		UserName: users,
 	}, nil
 }
 
-func (s *ServerService) PingTest(ctx context.Context, in *PingRequest) (*PingResponse, error) {
+func (s *ServerService) PingTest(ctx context.Context, in *pb.PingRequest) (*pb.PingResponse, error) {
 	result := "ping test OK"
-	return &PingResponse{
+	return &pb.PingResponse{
 		ResultString: result,
 	}, nil
 }
